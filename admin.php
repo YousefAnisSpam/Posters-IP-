@@ -13,8 +13,8 @@ if (file_exists('orders.json')) {
     $orders = json_decode(file_get_contents('orders.json'), true);
 }
 
-// Reverse array to show newest orders first
-$orders = array_reverse($orders);
+$originalOrders = $orders; // Save original order for indexing
+$orders = array_reverse($orders); // Reverse for display
 ?>
 
 <!DOCTYPE html>
@@ -78,36 +78,33 @@ $orders = array_reverse($orders);
                             <div class="shipping-info">
                                 <h3>Shipping & Payment Information:</h3>
                                 <div class="shipping-details">
-                                    <div class="shipping-detail">
-                                        <strong>Name:</strong> <?php echo $order['shipping']['name']; ?>
-                                    </div>
-                                    <div class="shipping-detail">
-                                        <strong>Email:</strong> <?php echo $order['shipping']['email']; ?>
-                                    </div>
-                                    <div class="shipping-detail">
-                                        <strong>Phone:</strong> <?php echo $order['shipping']['phone']; ?>
-                                    </div>
-                                    <div class="shipping-detail">
-                                        <strong>Address:</strong> <?php echo $order['shipping']['address']; ?>
-                                    </div>
-                                    <div class="shipping-detail">
-                                        <strong>City:</strong> <?php echo $order['shipping']['city']; ?>
-                                    </div>
-                                    <div class="shipping-detail">
-                                        <strong>ZIP:</strong> <?php echo $order['shipping']['zip']; ?>
-                                    </div>
-                                    <div class="shipping-detail">
-                                        <strong>Country:</strong> <?php echo $order['shipping']['country']; ?>
-                                    </div>
-                                    <div class="shipping-detail">
-                                        <strong>Payment Method:</strong> 
+                                    <div class="shipping-detail"><strong>Name:</strong> <?php echo $order['shipping']['name']; ?></div>
+                                    <div class="shipping-detail"><strong>Email:</strong> <?php echo $order['shipping']['email']; ?></div>
+                                    <div class="shipping-detail"><strong>Phone:</strong> <?php echo $order['shipping']['phone']; ?></div>
+                                    <div class="shipping-detail"><strong>Address:</strong> <?php echo $order['shipping']['address']; ?></div>
+                                    <div class="shipping-detail"><strong>City:</strong> <?php echo $order['shipping']['city']; ?></div>
+                                    <div class="shipping-detail"><strong>ZIP:</strong> <?php echo $order['shipping']['zip']; ?></div>
+                                    <div class="shipping-detail"><strong>Country:</strong> <?php echo $order['shipping']['country']; ?></div>
+                                    <div class="shipping-detail"><strong>Payment Method:</strong> 
                                         <?php 
-                                        $method = $order['shipping']['payment_method'];
-                                        echo ucwords(str_replace('_', ' ', $method));
+                                            $method = $order['shipping']['payment_method'];
+                                            echo ucwords(str_replace('_', ' ', $method));
                                         ?>
+                                    </div>
+                                    <div class="shipping-detail"><strong>Status:</strong> 
+                                        <?php echo isset($order['status']) ? ucfirst($order['status']) : 'Pending'; ?>
                                     </div>
                                 </div>
                             </div>
+
+                            <?php if (!isset($order['status']) || $order['status'] !== 'done'): ?>
+                                <form method="POST" action="mark_done.php">
+                                    <input type="hidden" name="order_index" value="<?php echo count($originalOrders) - $index - 1; ?>">
+                                    <button type="submit" class="mark-done-button">Mark as Done</button>
+                                </form>
+                            <?php else: ?>
+                                <p style="color: green; font-weight: bold; margin-top: 10px;">✅ Order Completed</p>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
