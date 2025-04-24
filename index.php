@@ -14,14 +14,21 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'];
 
     if (isset($accounts[$username]) && $accounts[$username]['password'] === $password) {
-        $_SESSION['username'] = $username;
-        $_SESSION['role'] = $accounts[$username]['role'];
-        header("Location: main_store.php");
-        exit();
-    } else {
-        $error = "Invalid username or password!";
+      $_SESSION['username'] = $username;
+      $_SESSION['role'] = $accounts[$username]['role']; // Store user role
+
+      // Redirect based on role
+      if ($_SESSION['role'] === 'admin') {
+          header("Location: admin.php"); // Redirect to admin dashboard
+      } else {
+          header("Location: main_store.php"); // Redirect to user templates
+      }
+      exit();
+  } else {
+      $error = "Invalid username or password.";
+  }
     }
-}
+
 ?>
 
 <!DOCTYPE html>
